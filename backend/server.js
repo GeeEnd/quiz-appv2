@@ -22,28 +22,28 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 // Firebase Admin Init
 // ---------------------
 
-if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-  console.error("❌ FIREBASE_SERVICE_ACCOUNT environment variable is missing!");
-  process.exit(1);
-}
+// if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+//   console.error("❌ FIREBASE_SERVICE_ACCOUNT environment variable is missing!");
+//   process.exit(1);
+// }
 
-let serviceAccount;
-try {
-  // Parse the JSON string
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+// let serviceAccount;
+// try {
+//   // Parse the JSON string
+//   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
-  // Fix line breaks in private_key
-  if (serviceAccount.private_key) {
-    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
-  }
-} catch (err) {
-  console.error("❌ Failed to parse FIREBASE_SERVICE_ACCOUNT:", err);
-  process.exit(1);
-}
+//   // Fix line breaks in private_key
+//   if (serviceAccount.private_key) {
+//     serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+//   }
+// } catch (err) {
+//   console.error("❌ Failed to parse FIREBASE_SERVICE_ACCOUNT:", err);
+//   process.exit(1);
+// }
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
 
 // ---------------------
