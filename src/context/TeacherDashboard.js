@@ -281,6 +281,7 @@ export default function TeacherDashboard() {
             <TableHead>
               <TableRow>
                 <TableCell>Timestamp</TableCell>
+                
                 <TableCell>Student Name</TableCell>
                 <TableCell>Student Email</TableCell>
                 {questions.map(q => <TableCell key={q.ID}>Q{q.ID}</TableCell>)}
