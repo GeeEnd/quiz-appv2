@@ -192,18 +192,7 @@ app.get("/api/responses", async (req, res) => {
   }
 });
 
-// ---------------------
-// Example Firebase Admin Route
-// ---------------------
-app.get("/api/fb-users", async (req, res) => {
-  try {
-    const listUsersResult = await admin.auth().listUsers();
-    res.json(listUsersResult.users);
-  } catch (err) {
-    console.error("Firebase Admin error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
