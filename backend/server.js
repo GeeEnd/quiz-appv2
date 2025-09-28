@@ -4,6 +4,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { google } from "googleapis";
+import admin from "firebase-admin";
 
 dotenv.config();
 
@@ -12,13 +13,25 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-const KEYFILE = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 
-// Google Sheets authentication
+// ---------------------
+// Firebase Admin Init
+// ---------------------
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+// ---------------------
+// Google Sheets Auth
+// ---------------------
 const auth = new google.auth.GoogleAuth({
-  keyFile: KEYFILE,
+  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
+
 const sheets = google.sheets({ version: "v4", auth });
 
 // ---------------------
@@ -30,7 +43,7 @@ app.post("/api/login", async (req, res) => {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: "Users!A:E", // Timestamp, Name, Section, Email, Password
+      range: "Users!A:E",
     });
 
     const rows = response.data.values || [];
@@ -81,25 +94,23 @@ app.get("/api/questions", async (req, res) => {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: "Questions!A:H", // ID, Question, ChoiceA-D, Answer, Points
+      range: "Questions!A:H",
     });
 
     const rows = response.data.values || [];
     let questions = rows
-  .slice(1)
-  .map((row) => ({
-    ID: row[0],
-    Question: row[1],
-    ChoiceA: row[2],
-    ChoiceB: row[3],
-    ChoiceC: row[4],
-    ChoiceD: row[5],
-    Answer: row[6],
-    Points: Number(row[7] || 1),
-  }));
+      .slice(1)
+      .map((row) => ({
+        ID: row[0],
+        Question: row[1],
+        ChoiceA: row[2],
+        ChoiceB: row[3],
+        ChoiceC: row[4],
+        ChoiceD: row[5],
+        Answer: row[6],
+        Points: Number(row[7] || 1),
+      }));
 
-
-    // Shuffle questions
     questions = questions
       .map((q) => ({ value: q, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
@@ -153,14 +164,12 @@ app.post("/api/responses", async (req, res) => {
 // ---------------------
 app.get("/api/responses", async (req, res) => {
   try {
-    // Fetch responses
     const respResponses = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: "Responses!A:F",
     });
     const responsesRows = respResponses.data.values || [];
 
-    // Fetch questions to map correct answers
     const respQuestions = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: "Questions!A:H",
@@ -169,11 +178,11 @@ app.get("/api/responses", async (req, res) => {
 
     const correctAnswersMap = {};
     questionsRows.slice(1).forEach((row) => {
-      correctAnswersMap[row[0]] = row[6]; // ID => Answer
+      correctAnswersMap[row[0]] = row[6];
     });
 
     const enhancedResponses = responsesRows
-      .slice(1) // skip header row
+      .slice(1)
       .map((r) => ({
         Timestamp: r[0],
         StudentName: r[1],
@@ -187,6 +196,19 @@ app.get("/api/responses", async (req, res) => {
     res.json(enhancedResponses);
   } catch (err) {
     console.error("Get responses error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ---------------------
+// Example Firebase Admin Route
+// ---------------------
+app.get("/api/fb-users", async (req, res) => {
+  try {
+    const listUsersResult = await admin.auth().listUsers();
+    res.json(listUsersResult.users);
+  } catch (err) {
+    console.error("Firebase Admin error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
