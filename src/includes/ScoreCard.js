@@ -3,9 +3,9 @@ import React from "react";
 import { Paper, Typography } from "@mui/material";
 
 export default function ScoreCard({ user, score, tabSwitchCount, questions, answers }) {
-  const correctCount = questions.filter(
-    (q) => answers[q.ID] === q.Answer
-  ).length;
+  // const correctCount = questions.filter(
+  //   (q) => answers[q.ID] === q.Answer
+  // ).length;
 
   return (
     <Paper elevation={3} sx={{ p: 4, mt: 4, textAlign: "center" }}>

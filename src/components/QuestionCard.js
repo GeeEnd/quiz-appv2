@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Radio, RadioGroup, FormControlLabel, Paper } from "@mui/material";
+import { Typography, Radio, RadioGroup, FormControlLabel, Paper } from "@mui/material";
 
 export default function QuestionCard({ q, selected, onSelect }) {
   const choiceLetters = ["A", "B", "C", "D"];

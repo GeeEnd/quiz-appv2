@@ -20,11 +20,13 @@ export const AuthProvider = ({ children }) => {
     const foundUser = await loginUser({ email, password });
     if (!foundUser) throw new Error("❌ Invalid email or password");
 
-    const normalizedUser = {
-      name: foundUser.Name || foundUser.name,
-      email: foundUser.Email || foundUser.email,
-      section: foundUser.Section || foundUser.section,
-    };
+const normalizedUser = {
+  name: foundUser.Name || foundUser.name,
+  email: foundUser.Email || foundUser.email,
+  sectionCode: foundUser.Section || foundUser.section, // ✅ use sectionCode
+};
+
+console.log("✅ Logged in user:", normalizedUser);
 
     setUser(normalizedUser);
     localStorage.setItem("quizUser", JSON.stringify(normalizedUser));

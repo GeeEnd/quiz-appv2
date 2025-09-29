@@ -80,7 +80,6 @@ const handleNext = () => {
     if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
-
 const handleSubmit = async () => {
   if (!isCurrentQuestionAnswered()) {
     setMessage("⚠ Please answer the final question before submitting.");
@@ -96,13 +95,20 @@ const handleSubmit = async () => {
       }
     });
 
-    await saveResponse({
-      StudentName: user.name, // make sure lowercase
+    // ✅ Prepare payload
+    const payload = {
+      StudentName: user.name,
       StudentEmail: user.email,
-      AnswersJson: JSON.stringify(answers), // string
+      SectionCode: user.sectionCode, // may be undefined if not set
+      AnswersJson: JSON.stringify(answers),
       Score: calculatedScore,
       Switches: tabSwitchCount,
-    });
+    };
+
+    // ✅ Log before sending
+    console.log("📤 Sending response payload to backend:", payload);
+
+    await saveResponse(payload);
 
     setScore(calculatedScore);
     setSubmitted(true);
@@ -114,8 +120,6 @@ const handleSubmit = async () => {
     setLoadingScore(false);
   }
 };
-
-
 
   return {
     questions,

@@ -98,8 +98,10 @@
 //   return resp.json();
 // };
 // src/services/sheetsdb.js
+
+const BASE_API = process.env.REACT_APP_BASE_API || "http://localhost:5000/api";
+
 const headers = { "Content-Type": "application/json" };
-const BASE_API = "/api"; // proxy handles port forwarding in dev
 
 // LOGIN
 export const loginUser = async ({ email, password }) => {
@@ -114,7 +116,7 @@ export const loginUser = async ({ email, password }) => {
     throw new Error(err.error || "❌ Invalid email or password");
   }
 
-  return resp.json(); // returns user object from backend
+  return resp.json();
 };
 
 // REGISTER
@@ -141,17 +143,22 @@ export const getQuestions = async () => {
 };
 
 // SAVE RESPONSES
-// SAVE RESPONSES
-export const saveResponse = async (responseData) => {
-  const resp = await fetch("/api/responses", {
+export const saveResponse = async ({
+  StudentName,
+  StudentEmail,
+  AnswersJson,
+  Score,
+  Switches = 0,
+}) => {
+  const resp = await fetch(`${BASE_API}/responses`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({
-      StudentName: responseData.StudentName,
-      StudentEmail: responseData.StudentEmail,
-      AnswersJson: responseData.AnswersJson, // must be string
-      Score: responseData.Score,
-      Switches: responseData.Switches || 0,
+      StudentName,
+      StudentEmail,
+      AnswersJson,
+      Score,
+      Switches,
     }),
   });
 
@@ -163,16 +170,15 @@ export const saveResponse = async (responseData) => {
   return resp.json();
 };
 
-
-
-export async function getStudentResponse(email) {
-  const all = await getResponses(); // assumes this returns an array of responses
-  return all.find((r) => r.StudentEmail === email);
-}
-
-
+// GET ALL RESPONSES
 export const getResponses = async () => {
-  const resp = await fetch("/api/responses"); // new GET endpoint
+  const resp = await fetch(`${BASE_API}/responses`);
   if (!resp.ok) throw new Error("❌ Failed to fetch responses");
   return resp.json();
+};
+
+// GET SINGLE STUDENT RESPONSE
+export const getStudentResponse = async (email) => {
+  const all = await getResponses();
+  return all.find((r) => r.StudentEmail === email);
 };
